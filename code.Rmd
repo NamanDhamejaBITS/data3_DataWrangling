@@ -90,5 +90,7 @@ data$Occupation[which(is.na(data$Occupation))]="Missing"
 Replace '-' characters in Months column
 ```{r}
 data$Months <- str_replace_all(as.character(data$Months),"-","")
+data$Age<-as.numeric(data$Age)
 
+View(data)
 ```
