@@ -94,3 +94,23 @@ data$Age<-as.numeric(data$Age)
 
 View(data)
 ```
+
+
+Loan Closed column into Y,N only
+```{r}
+unique(data$`Loan Closed`)
+data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="No","N")
+data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="NO","N")
+data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="n","N")
+data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="N","N")
+
+data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="y","Y")
+data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="YES","Y")
+
+data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="O","Y")
+# data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="o","O")
+
+unique(data$`Loan Closed`)
+
+
+```
