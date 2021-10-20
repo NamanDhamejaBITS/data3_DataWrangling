@@ -1,0 +1,21 @@
+---
+title: "Untitled"
+author: "Naman Dhameja"
+date: "20/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Import Data
+```{r}
+library(readxl)
+data <- read_excel("G:/GithubBITS/Assignment3_DataWrangling/India Credit Data.xlsx", skip = 1)
+View(data)
+# Remove first row
+data<-data[-1,]
+
+
+
+```
