@@ -7,6 +7,10 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+install.packages(compare)
+library(compare)
 ```
 Import Data
 ```{r}
@@ -15,7 +19,70 @@ data <- read_excel("G:/GithubBITS/Assignment3_DataWrangling/India Credit Data.xl
 View(data)
 # Remove first row
 data<-data[-1,]
+```
+COMMENTED DONT RUN
+```{r}
+
+v<-seq(100,1000,100)
+
+for(j in nrow(data)){
+for( i in c(100,200,300,400,1000)){
+if(match(as.character(data$`BORROWER ID`[j]),as.character(str_c("End of ",i," records")))){
+  print(data$`BORROWER ID`[j])
+}
+}
+}
+for( i in c(100,200,300,1000,400)){
+print(str_c("End of ",i," records"))
+}
+```
+\\
+Remove columns with "End of..."
+```{r}
+data<-data[-c(98,197,298,398,498,1006),]
+View(data)
+```
+
+Converting different formats of string to one.
+
+```{r}
+unique(data$`Bank Account`)
+tolower(unique(data$`Bank Account`))
+trial<-data$`Bank Account`
+trial<-str_replace_all(tolower(data$`Bank Account`),"-","")
+unique(trial)
+
+data$`Bank Account`<-str_replace_all(tolower(data$`Bank Account`),"-","")
+
+View(data)
+```
+
+Gender column to M,F,O only
+```{r}
+data$Gender<-str_replace_all(tolower(data$Gender),"-","")
+
+unique(data$Gender)
+data$Gender<-replace(data$Gender,data$Gender=="male","M")
+data$Gender<-replace(data$Gender,data$Gender=="m","M")
+
+data$Gender<-replace(data$Gender,data$Gender=="female","F")
+data$Gender<-replace(data$Gender,data$Gender=="f","F")
+
+data$Gender<-replace(data$Gender,data$Gender=="other","O")
+data$Gender<-replace(data$Gender,data$Gender=="o","O")
+
+unique(data$Gender)
+
+View(data)
+```
 
 
+Converting multiple NAs to "Missing"
+```{r}
+data$`Bank Account`[which(is.na(data$`Bank Account`))]="Missing"
+data$Purpose[which(is.na(data$Purpose))]="Missing"
+data$`Marital status`[which(is.na(data$`Marital status`))]="Missing"
+data$SECURITY[which(is.na(data$SECURITY))]="Missing"
+data$Occupation[which(is.na(data$Occupation))]="Missing"
 
 ```
