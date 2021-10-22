@@ -11,6 +11,7 @@ library(tidyverse)
 library(dplyr)
 install.packages(compare)
 library(compare)
+library(stringr)
 ```
 Import Data
 ```{r}
@@ -20,21 +21,35 @@ View(data)
 # Remove first row
 data<-data[-1,]
 ```
-COMMENTED DONT RUN
+Removing Using length logic
 ```{r}
+data$`BORROWER ID`[1]
+nchar(data$`BORROWER ID`[1])
+nchar(data$`BORROWER ID`[98])
+ct<-0
+for(i in 1:range(nrow(data))){
+  if(nchar(data$`BORROWER ID`[i])>=18){
+    print(data$`BORROWER ID`[i])
+    
+    data<-data[-c(i),]
+  }
+}
+## _____--------______##
+for(i in 1:range(nrow(data))){
+  if(nchar(data$`BORROWER ID`[i])>=18){
+    print(data$`BORROWER ID`[i])
+    
+    data<-data[-c(i),]
+  }
+}
 
-v<-seq(100,1000,100)
+for(i in 1:range(nrow(data))){
+  text = data$`BORROWER ID`[i]
+   if(str_count(text, ' ')>0){
+     data<-data[-c(i),]
+   }
+}
 
-for(j in nrow(data)){
-for( i in c(100,200,300,400,1000)){
-if(match(as.character(data$`BORROWER ID`[j]),as.character(str_c("End of ",i," records")))){
-  print(data$`BORROWER ID`[j])
-}
-}
-}
-for( i in c(100,200,300,1000,400)){
-print(str_c("End of ",i," records"))
-}
 ```
 \\
 Remove columns with "End of..."
@@ -47,13 +62,16 @@ Converting different formats of string to one.
 
 ```{r}
 unique(data$`Bank Account`)
-tolower(unique(data$`Bank Account`))
+tolower(unique( data$`Bank Account`))
 trial<-data$`Bank Account`
 trial<-str_replace_all(tolower(data$`Bank Account`),"-","")
 unique(trial)
 
 data$`Bank Account`<-str_replace_all(tolower(data$`Bank Account`),"-","")
+data$`Bank Account`<-replace(data$`Bank Account`,data$`Bank Account`=="dnk","do not know")
 
+data$`Bank Account`<-replace(data$`Bank Account`,data$`Bank Account`=="nba","no bank account")
+unique(data$`Bank Account`)
 View(data)
 ```
 
@@ -107,10 +125,46 @@ data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="N","N")
 data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="y","Y")
 data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="YES","Y")
 
-data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="O","Y")
-# data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="o","O")
+data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="Y","Yes")
+data$`Loan Closed`<-replace(data$`Loan Closed`,data$`Loan Closed`=="N","No")
 
 unique(data$`Loan Closed`)
 
 
 ```
+
+```{r}
+
+unique(data$Purpose)
+head(data$`Loan Amount`,10)
+head(data$`Annual Income`,10)
+data$`Annual Income`<-as.integer(data$`Annual Income`)
+```
+```{r}
+unique(data$`Marital status`)
+data$`Marital status`<-tolower(data$`Marital status`)
+unique(data$`Marital status`)
+
+```
+```{r}
+unique(data$SECURITY)
+
+```
+```{r}
+flags<-list()
+trial<-list()
+`%nin%`<-Negate(`%in%`)
+unique(data$Purpose)
+other<-list("missing","others")
+good<-list("education","business","farming")
+bad<-list("household furniture/equipment","vehicle purchase  (used)","vacation" ,"domestic appliances","vehicle purchase (new)","work furniture/equipment","television","repairs" )
+for( i in 1:50){
+  if(data$Purpose[i] %nin% good &data$Purpose[i] %nin% other ){
+    append(trial,data$Purpose[i])
+  }
+  
+}
+
+
+```
+
