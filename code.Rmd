@@ -1,32 +1,30 @@
 ---
-title: "Untitled"
-author: "Naman Dhameja"
+title: "Data Wrangling Assignment(Group 6)"
+author: Akshara Joshi, Ashish Gupta, Arjun J Bhatnagar,Naman Dhameja, Palak Bansal,
+  Sudhanshu Ranjan
 date: "20/10/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(dplyr)
-#install.packages('compare')
-library(compare)
 library(stringr)
 ```
-Import Data
+Importing Data and removing the first Row
 ```{r}
 library(readxl)
-data <- read_excel("C:/Users/gupta/Documents/GitHub/data3_DataWrangling/India Credit Data.xlsx", skip = 1)
+data <- read_excel("G:/GithubBITS/Assignment3_DataWrangling/India Credit Data.xlsx", skip = 1)
 View(data)
 # Remove first row
 data<-data[-1,]
 ```
-Removing Using length logic
+Removing "End of.." Using length logic
+1st Method
 ```{r}
-data$`BORROWER ID`[1]
-nchar(data$`BORROWER ID`[1])
-nchar(data$`BORROWER ID`[98])
-# ct<-0
 # for(i in 1:range(nrow(data))){
 #   if(nchar(data$`BORROWER ID`[i])>=18){
 #     print(data$`BORROWER ID`[i])
@@ -34,25 +32,21 @@ nchar(data$`BORROWER ID`[98])
 #     data<-data[-c(i),]
 #   }
 # }
-## _____--------______##
-for(i in 1:range(nrow(data))){
-  if(nchar(data$`BORROWER ID`[i])>=18){
-    print(data$`BORROWER ID`[i])
-    
-    data<-data[-c(i),]
-  }
-}
-# 2nd method
-for(i in 1:range(nrow(data))){
-  text = data$`BORROWER ID`[i]
-   if(str_count(text, ' ')>0){
-     data<-data[-c(i),]
-   }
-}
+```
+
+Removing "End of.." Using Space logic
+2nd method
+```{r}
+# for(i in 1:range(nrow(data))){
+#   text = data$`BORROWER ID`[i]
+#    if(str_count(text, ' ')>0){
+#      data<-data[-c(i),]
+#    }
+# }
 
 ```
-\\
-Remove columns with "End of..."
+Remove columns with "End of..." using row numbers
+3rd method
 ```{r}
 # 3rd method
 data<-data[-c(98,197,298,398,498,1006),]
@@ -62,22 +56,23 @@ View(data)
 Converting different formats of string to one.
 
 ```{r}
-unique(data$`Bank Account`)
-tolower(unique( data$`Bank Account`))
-trial<-data$`Bank Account`
+unique(data$`Bank Account`) # Finding the unique Bank Account entries detected by the computer
+tolower(unique( data$`Bank Account`))# Converting them to lowercase
+trial<-data$`Bank Account` # Trial list for experimenting the operations on the column
 trial<-str_replace_all(tolower(data$`Bank Account`),"-","")
 unique(trial)
-
+# Replacing similar meaning columns entered differently
 data$`Bank Account`<-str_replace_all(tolower(data$`Bank Account`),"-","")
 data$`Bank Account`<-replace(data$`Bank Account`,data$`Bank Account`=="dnk","do not know")
 
 data$`Bank Account`<-replace(data$`Bank Account`,data$`Bank Account`=="nba","no bank account")
-unique(data$`Bank Account`)
+unique(data$`Bank Account`) # Again checking if now the data is cleaned or not
 View(data)
 ```
 
 Gender column to M,F,O only
 ```{r}
+# Categorizing Gender Data into "Male(M)", "Female(F)", "Other(O)" 
 data$Gender<-str_replace_all(tolower(data$Gender),"-","")
 
 unique(data$Gender)
@@ -134,7 +129,7 @@ unique(data$`Loan Closed`)
 
 
 ```
-
+Going through the data for any discrepancies
 ```{r}
 
 unique(data$Purpose)
@@ -147,24 +142,25 @@ data$`Annual Income`<-as.integer(data$`Annual Income`)
 unique(data$`Marital status`)
 data$`Marital status`<-tolower(data$`Marital status`)
 unique(data$`Marital status`)
-
-```
-
-```{r}
 unique(data$SECURITY)
-
 ```
 
+Creating a new column of good and bad loans, according to the purpose.
+The depreciating assets are termed to be bad loans like: vehicles and repairs. 
+The assets like education are considered to be good loans. 
+According to this, we created 3 lists.
 ```{r}
-trial<-c()
-#`%nin%`<-Negate(`%in%`)
+trial<-c()# creating temporary empty list
 unique(data$Purpose)
-other<-list("missing","others")
+# Categorizing the Purpose into Good, Bad and Others
+other<-list("missing","others") 
 good<-list("education","business","farming")
 bad<-list("household furniture/equipment","vehicle purchase  (used)","vacation" ,"domestic appliances","vehicle purchase (new)","work furniture/equipment","television","repairs" )
+
+# Making a column according to the critera mentioned above
+
 for( i in 1:range(nrow(data))){
   if(data$Purpose[i] %in% bad ){
-    #append(trial,data$Purpose[i])
     trial<-c(trial,"Bad Loan")
     
   }else if(data$Purpose[i] %in% good){
@@ -177,6 +173,9 @@ data$LoanType<-trial
 View(data)
 summary(as.factor(data$LoanType))
 ```
+
+There are few instances where all installments are paid but still loan isn't mentioned close, so for that we have changed certain entries where number of paid installments are equal to 48. 
+
 ```{r}
 
 for( i in 1:range(nrow(data))){
@@ -184,9 +183,9 @@ for( i in 1:range(nrow(data))){
     data$`Loan Closed`[i]<-"Yes"
   }
   }
-
-
 ```
+
+Calculated % paid amount and updated the %paid column in dataset. 
 ```{r}
 View(data)
 for( i in 1:range(nrow(data))){
@@ -194,7 +193,10 @@ for( i in 1:range(nrow(data))){
   }
 
 ```
-Potential Defaulter
+##Potential Defaulter
+Criteria decided for potential defaulter is:
+1. %Paid amount is less than 40.
+2. The skipped installments are atleast 30% of the number of installments paid.
 ```{r}
 trial<-c()
 
@@ -210,6 +212,11 @@ data$PotentialDefaulter<-trial
 View(data)
 summary(as.factor(data$PotentialDefaulter))
 
+```
+##Data Visualization
+
+```{r}
+
 library(ggplot2)
 
 #potential defaulters and loan amount and purpose
@@ -218,6 +225,10 @@ ggplot(data) +
  geom_boxplot(shape = "circle") +
  scale_fill_hue(direction = 1) +
  theme_minimal()
+
+```
+
+```{r}
 #potential defaulters and loan amount and purpose grouped by gender
 ggplot(data) +
  aes(x = PotentialDefaulter, y = `Loan Amount`, fill = Purpose) +
@@ -225,7 +236,9 @@ ggplot(data) +
  scale_fill_hue(direction = 1) +
  theme_minimal() +
  facet_wrap(vars(Gender))
+```
 
+```{r}
 
 library(dplyr)
 library(ggplot2)
@@ -237,6 +250,10 @@ data %>%
  geom_boxplot(shape = "circle") +
  scale_fill_hue(direction = 1) +
  theme_minimal()
+
+```
+
+```{r}
 #loan type based on loan closed or not
 data %>%
  filter(!(`Marital status` %in% "missing")) %>%
