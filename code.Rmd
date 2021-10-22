@@ -156,7 +156,6 @@ unique(data$SECURITY)
 ```
 
 ```{r}
-flags<-list()
 trial<-c()
 #`%nin%`<-Negate(`%in%`)
 unique(data$Purpose)
@@ -174,6 +173,43 @@ for( i in 1:range(nrow(data))){
     trial<-c(trial,"Missing/Other")
   }
 }
-data$
+data$LoanType<-trial
+View(data)
+summary(as.factor(data$LoanType))
 ```
+```{r}
+
+for( i in 1:range(nrow(data))){
+  if(data$`# paid`[i]==48){
+    data$`Loan Closed`[i]<-"Yes"
+  }
+  }
+
+
+```
+```{r}
+View(data)
+for( i in 1:range(nrow(data))){
+  data$`% Paid`[i]<-round((data$`# paid`[i]/48)*100,2)
+  }
+
+```
+Potential Defaulter
+```{r}
+trial<-c()
+
+for( i in 1:range(nrow(data))){
+  if(data$`% Paid`[i]<=40 && data$`# skipped`[i]>=round(data$`# paid`[i]*0.3,0) ){
+    trial<-c(trial,"Yes")
+    
+  }else{
+    trial<-c(trial,"No")
+  }
+}
+data$PotentialDefaulter<-trial
+View(data)
+summary(as.factor(data$PotentialDefaulter))
+
+```
+
 
