@@ -16,7 +16,7 @@ library(stringr)
 Import Data
 ```{r}
 library(readxl)
-data <- read_excel("G:/GithubBITS/Assignment3_DataWrangling/India Credit Data.xlsx", skip = 1)
+data <- read_excel("C:/Users/gupta/Documents/GitHub/data3_DataWrangling/India Credit Data.xlsx", skip = 1)
 View(data)
 # Remove first row
 data<-data[-1,]
